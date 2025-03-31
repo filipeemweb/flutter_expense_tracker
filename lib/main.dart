@@ -10,6 +10,9 @@ class ExpensesTrackerApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(home: const HomeScreen());
+    return MaterialApp(
+      theme: ThemeData(useMaterial3: true),
+      home: const HomeScreen(),
+    );
   }
 }
