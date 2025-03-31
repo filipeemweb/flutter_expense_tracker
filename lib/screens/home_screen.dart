@@ -33,6 +33,39 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  void _removeExpenseFromRegisteredList(Expense expense) {
+    final expenseIndex = _registeredExpenses.indexOf(expense);
+
+    setState(() {
+      _registeredExpenses.remove(expense);
+    });
+
+    _handleSnackBarOnRemoveExpense(expense, index: expenseIndex);
+  }
+
+  void _handleSnackBarOnRemoveExpense(Expense expense, {required int index}) {
+    ScaffoldMessenger.of(context).clearSnackBars();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Expense deleted!'),
+        duration: Duration(seconds: 3),
+        action: SnackBarAction(
+          label: "Undo",
+          onPressed: () => _undoExpenseDeletion(expense, index: index),
+        ),
+      ),
+    );
+  }
+
+  void _undoExpenseDeletion(Expense expense, {required int index}) {
+    final expenseInList = _registeredExpenses.contains(expense);
+    if (expenseInList) return;
+
+    setState(() {
+      _registeredExpenses.insert(index, expense);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -48,7 +81,17 @@ class _HomeScreenState extends State<HomeScreen> {
       body: Column(
         children: [
           const Text('Charts'),
-          Expanded(child: ExpensesList(expenses: _registeredExpenses)),
+          if (_registeredExpenses.isEmpty) ...[
+            const Expanded(child: Center(child: Text('No expenses found'))),
+          ],
+          if (_registeredExpenses.isNotEmpty) ...[
+            Expanded(
+              child: ExpensesList(
+                expenses: _registeredExpenses,
+                onRemoveExpense: _removeExpenseFromRegisteredList,
+              ),
+            ),
+          ],
         ],
       ),
     );
