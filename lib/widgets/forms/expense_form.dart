@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_expense_tracker/enums/expense_category.dart';
 import 'package:flutter_expense_tracker/models/expense.dart';
@@ -62,7 +65,7 @@ class _ExpenseFormState extends State<ExpenseForm> {
   }
 
   void _submitExpenseData() {
-    if (!_isFormValid) return _openErrorDialog();
+    if (!_isFormValid) return _openPlatformErrorDialog();
 
     final enteredAmount = double.tryParse(_amountController.text) ?? 0.0;
 
@@ -76,22 +79,52 @@ class _ExpenseFormState extends State<ExpenseForm> {
     Navigator.of(context).pop(expense);
   }
 
-  void _openErrorDialog() {
+  void _openPlatformErrorDialog() {
+    if (Platform.isIOS) {
+      _renderCupertinoErrorDialog();
+      return;
+    }
+
+    _renderDefaultErrorDialog();
+  }
+
+  void _renderDefaultErrorDialog() {
     showDialog(
       context: context,
-      builder:
-          (ctx) => AlertDialog(
-            title: const Text('Invalid input'),
-            content: const Text(
-              'Please make sure a valid value was entered for each field.',
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(ctx),
-                child: const Text('Understood'),
-              ),
-            ],
+      builder: (ctx) {
+        return AlertDialog(
+          title: const Text('Invalid input'),
+          content: const Text(
+            'Please make sure a valid value was entered for each field.',
           ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('Understood'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _renderCupertinoErrorDialog() {
+    showCupertinoDialog(
+      context: context,
+      builder: (ctx) {
+        return CupertinoAlertDialog(
+          title: const Text('Invalid input'),
+          content: const Text(
+            'Please make sure a valid value was entered for each field.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('Understood'),
+            ),
+          ],
+        );
+      },
     );
   }
 
