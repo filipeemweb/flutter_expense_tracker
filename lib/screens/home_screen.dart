@@ -17,9 +17,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> _openAddExpenseOverlay() async {
     final expenseToBeAdded = await showModalBottomSheet(
+      context: context,
       isScrollControlled: true,
       useSafeArea: true,
-      context: context,
+      constraints: BoxConstraints(maxHeight: double.infinity),
       builder: (ctx) => ExpenseForm(),
     );
 
