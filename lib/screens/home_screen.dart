@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_expense_tracker/mocks/expenses_mock.dart';
 import 'package:flutter_expense_tracker/models/expense.dart';
+import 'package:flutter_expense_tracker/widgets/charts/chart.dart';
 import 'package:flutter_expense_tracker/widgets/forms/expense_form.dart';
 import 'package:flutter_expense_tracker/widgets/lists/expenses_list.dart';
 
@@ -80,7 +81,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: Column(
         children: [
-          const Text('Charts'),
+          Chart(expenses: _registeredExpenses),
           if (_registeredExpenses.isEmpty) ...[
             const Expanded(child: Center(child: Text('No expenses found'))),
           ],
