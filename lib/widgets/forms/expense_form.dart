@@ -117,69 +117,110 @@ class _ExpenseFormState extends State<ExpenseForm> {
   Widget build(BuildContext context) {
     final keyboardSpace = MediaQuery.of(context).viewInsets.bottom;
 
-    return SizedBox(
-      height: double.infinity,
-      width: double.infinity,
-      child: SingleChildScrollView(
-        child: Padding(
-          padding: EdgeInsets.fromLTRB(16, 16, 16, keyboardSpace + 16),
-          child: Column(
-            children: [
-              TextField(
-                controller: _titleController,
-                maxLength: 50,
-                decoration: const InputDecoration(labelText: 'Title'),
-              ),
-              Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      controller: _amountController,
-                      keyboardType: TextInputType.number,
-                      decoration: InputDecoration(
-                        prefixText: '\$',
-                        labelText: 'Amount',
+    return LayoutBuilder(
+      builder: (ctx, constrains) {
+        final width = constrains.maxWidth;
+
+        return SizedBox(
+          height: double.infinity,
+          width: double.infinity,
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: EdgeInsets.fromLTRB(16, 16, 16, keyboardSpace + 16),
+              child:
+                  width >= 600
+                      ? Column(
+                        children: [
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Expanded(child: _buildTitleInput()),
+                              const SizedBox(width: 16),
+                              Expanded(child: _buildAmountInput()),
+                            ],
+                          ),
+                          const SizedBox(height: 16),
+                          Row(
+                            children: [
+                              Expanded(child: _buildDatePicker()),
+                              const SizedBox(width: 16),
+                              Expanded(child: _buildDropdown()),
+                            ],
+                          ),
+                          const SizedBox(height: 16),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [_buildFormButtons()],
+                          ),
+                        ],
+                      )
+                      : Column(
+                        children: [
+                          _buildTitleInput(),
+                          Row(
+                            children: [
+                              Expanded(child: _buildAmountInput()),
+                              SizedBox(width: 16),
+                              Expanded(child: _buildDatePicker()),
+                            ],
+                          ),
+                          const SizedBox(height: 16),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              Expanded(child: _buildDropdown()),
+                              const SizedBox(width: 24),
+                              _buildFormButtons(),
+                            ],
+                          ),
+                        ],
                       ),
-                    ),
-                  ),
-                  SizedBox(width: 16),
-                  Expanded(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        Text(_datetimeInputValue),
-                        IconButton(
-                          onPressed: () => _openDatePicker(),
-                          icon: Icon(Icons.calendar_month),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              Row(
-                children: [
-                  DropdownButton<EExpenseCategory>(
-                    value: _selectedCategory,
-                    items: _mapCategoriesToDropdownItems(),
-                    onChanged: _handleCategorySelected,
-                  ),
-                  const Spacer(),
-                  TextButton(
-                    onPressed: () => Navigator.of(context).pop(),
-                    child: const Text('Cancel'),
-                  ),
-                  ElevatedButton(
-                    onPressed: _submitExpenseData,
-                    child: const Text('Save'),
-                  ),
-                ],
-              ),
-            ],
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
+
+  Widget _buildTitleInput() => TextField(
+    controller: _titleController,
+    maxLength: 50,
+    decoration: const InputDecoration(labelText: 'Title'),
+  );
+
+  Widget _buildAmountInput() => TextField(
+    controller: _amountController,
+    keyboardType: TextInputType.number,
+    decoration: InputDecoration(prefixText: '\$', labelText: 'Amount'),
+  );
+
+  Widget _buildDatePicker() => Row(
+    mainAxisAlignment: MainAxisAlignment.end,
+    children: [
+      Expanded(child: Text(_datetimeInputValue)),
+      IconButton(
+        onPressed: () => _openDatePicker(),
+        icon: Icon(Icons.calendar_month),
+      ),
+    ],
+  );
+
+  Widget _buildDropdown() => DropdownButton<EExpenseCategory>(
+    value: _selectedCategory,
+    items: _mapCategoriesToDropdownItems(),
+    onChanged: _handleCategorySelected,
+  );
+
+  Widget _buildFormButtons() => Row(
+    children: [
+      TextButton(
+        onPressed: () => Navigator.of(context).pop(),
+        child: const Text('Cancel'),
+      ),
+      ElevatedButton(
+        onPressed: _submitExpenseData,
+        child: const Text('Save expense'),
+      ),
+    ],
+  );
 }
