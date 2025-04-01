@@ -69,6 +69,16 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
+
+    Widget mainContent = const Center(child: Text('No expenses found.'));
+    if (_registeredExpenses.isNotEmpty) {
+      mainContent = ExpensesList(
+        expenses: _registeredExpenses,
+        onRemoveExpense: _removeExpenseFromRegisteredList,
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Flutter Expense Tracker'),
@@ -79,22 +89,20 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-      body: Column(
-        children: [
-          Chart(expenses: _registeredExpenses),
-          if (_registeredExpenses.isEmpty) ...[
-            const Expanded(child: Center(child: Text('No expenses found'))),
-          ],
-          if (_registeredExpenses.isNotEmpty) ...[
-            Expanded(
-              child: ExpensesList(
-                expenses: _registeredExpenses,
-                onRemoveExpense: _removeExpenseFromRegisteredList,
+      body:
+          width < 600
+              ? Column(
+                children: [
+                  Chart(expenses: _registeredExpenses),
+                  Expanded(child: mainContent),
+                ],
+              )
+              : Row(
+                children: [
+                  Expanded(child: Chart(expenses: _registeredExpenses)),
+                  Expanded(child: mainContent),
+                ],
               ),
-            ),
-          ],
-        ],
-      ),
     );
   }
 }
